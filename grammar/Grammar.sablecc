@@ -1,0 +1,98 @@
+Package checker;
+
+Helpers
+  letter = ['A'..'Z'] | ['a'..'z'] | '_' ;
+  digit = ['0'..'9'];
+  cr = 13;
+  lf = 10;
+  tab = 9; 
+  line_terminator = lf | cr | cr lf;
+  space = ' ' | '\n';
+
+Tokens   
+
+  tclass     = 'class';
+  extends   = 'extends';
+  super    = 'super';
+  this    = 'this';
+  new      = 'new';
+  return = 'return';
+
+  l_brace     = '{';
+  r_brace     = '}';
+  semicolon   = ';';
+  comma    = ',';
+  l_par    ='(';
+  r_par    =')';
+  l_sq	   = '[';
+  r_sq     = ']';
+  period    ='.';
+  eq      ='=';
+
+  new_line = line_terminator;
+  blank = ( tab | space )+;
+
+  identifier = letter (letter | digit)*;
+
+
+Ignored Tokens 
+  blank, new_line;
+
+Productions
+
+  prog = 
+    class_decl* ;
+
+  class_decl = 
+     tclass [classname]:identifier extends [extendsname]:identifier l_brace field_decl* constructor_decl method_decl* r_brace ;
+
+  field_decl =
+      [classname]:identifier [fieldname]:identifier semicolon ;
+
+  constructor_decl = 
+    identifier [l1]:l_par param_decl_list [r1]:r_par l_brace super [l2]:l_par field_list [r2]:r_par semicolon this_field_assig* r_brace ;
+
+  method_decl =
+    [classname]:identifier [methodname]:identifier l_par param_decl_list r_par l_brace return term semicolon r_brace ;
+
+  param_decl_list =
+    {param_args} param_arg comma_param_arg_list* |
+    {empty} ;
+
+  param_arg =
+    {ident} [classname]:identifier [param]:identifier |
+    {this} this identifier;
+
+  comma_param_arg_list =
+    comma param_arg;
+
+  field_list =
+    {field_list} field_name comma_field* |
+    {empty} ;
+
+  field_name = identifier;
+
+  comma_field= comma field_name;
+
+  this_field_assig =
+    this period [left_field]:identifier eq [right_field]:identifier semicolon;
+
+  term = 
+  	{non_left_rec_term} non_left_rec_term |
+    {field_access} non_left_rec_term period identifier |
+    {method_call} non_left_rec_term period identifier l_par term_list r_par |
+   	{cast} l_sq identifier r_sq non_left_rec_term ;
+
+
+  non_left_rec_term =
+    {variable} identifier |
+    {this} this |
+    {object_creation} new identifier l_par term_list r_par |
+    {bracket} l_par term r_par ;
+
+  term_list = 
+    {term_list} term comma_term* |
+    {empty} ;
+
+  comma_term =
+    comma term;

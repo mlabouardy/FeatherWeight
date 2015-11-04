@@ -1,0 +1,11 @@
+--- uk/co/zonetora/fj/ast/parser/Parser.java	2015-10-20 17:47:22.000000000 +0200
++++ uk/co/zonetora/fj/ast/parser/Parser.java	2015-10-20 17:47:18.000000000 +0200
+@@ -19,7 +19,7 @@
+     protected ArrayList nodeList;
+ 
+     private final Lexer lexer;
+-    private final ListIterator stack = new LinkedList().listIterator();
++    private final ListIterator<State> stack = new LinkedList<State>().listIterator();
+     private int last_pos;
+     private int last_line;
+     private Token last_token;
